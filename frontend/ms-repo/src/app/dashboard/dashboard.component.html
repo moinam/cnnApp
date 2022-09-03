@@ -1,0 +1,69 @@
+<div class="container-fluid emp-profile">
+  <div class="row">
+    <form class="form-inline" role="form" id="searchForm" #form="ngForm" (ngSubmit)="getPrediction()">
+      <div class="col-md-12">
+        <p-dropdown [options]="dataService.clients" [(ngModel)]="selectedClient" placeholder="Select a Client"
+          optionLabel="name" [ngModelOptions]="{standalone: true}">
+        </p-dropdown>
+        <p-dropdown [options]="dataService.taskTypes" [(ngModel)]="selectedTaskType" placeholder="Select a Task Type"
+          [ngModelOptions]="{standalone: true}">
+        </p-dropdown>
+        <input [ngModelOptions]="{standalone: true}" type=" text" pInputText [(ngModel)]="quantity"
+          placeholder="Enter Number of Tasks" />
+        <button type="submit" class="btn btn-primary"
+          [disabled]="selectedClient == null || selectedTaskType == null || quantity == null" style=" margin-left: 10px; margin-bottom:
+          5px;">
+          Fetch Results
+        </button>
+        <button type="button" class="btn btn-danger" style="margin-left: 10px; margin-bottom: 5px;" (click)="reset()">
+          <i class="fa-solid fa-xmark"></i>
+          Clear
+        </button>
+        <input class="search" [(ngModel)]="search" [ngModelOptions]="{standalone: true}"
+          style="background-size: 16px 21px; padding: 0px 5px; margin: -2px; width: 180px; margin-top: 8px;"
+          Id="myInput" type="text" placeholder="Search..">
+      </div>
+    </form>
+  </div>
+  <br>
+  <div class="row" style="margin: 0px -11px; overflow-y: scroll; height:500px">
+    <table class='table'>
+      <thead>
+        <tr style="background-color: #005952; color: beige;">
+          <th>TeamID</th>
+          <th>Location</th>
+          <th>Members</th>
+          <th>Travel Duration</th>
+          <th>Predicted Working Time</th>
+          <th>Total Time</th>
+          <th>Map View</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let team of dataService.teams | tableFilter:search:'members'">
+          <td>{{team.teamId}}</td>
+          <td>{{team.location}}</td>
+          <td>{{team.members}}</td>
+          <td>{{getDate(team.travelDuration)}}</td>
+          <td>{{getDate(team.predictedWorkingTime)}}</td>
+          <td>{{getDate(team.total)}}</td>
+          <td>
+            <i class="fa-solid fa-map-location-dot" style="float: left; margin: 2px; cursor: pointer; color: #005952;"
+              (click)="showMap(team)"></i>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<p-dialog header="Map View" [(visible)]="dispMap" [modal]="true" [style]="{width: '700px'}" [baseZIndex]="10000"
+  [draggable]="false" [resizable]="false">
+  <img src={{map_url}}>
+  <ng-template pTemplate="footer">
+    <button type="button" class="btn btn-primary" style="margin-left: 10px; margin-bottom: 5px;"
+      (click)="dispMap=false">
+      Ok
+    </button>
+  </ng-template>
+</p-dialog>
