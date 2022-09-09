@@ -1,10 +1,12 @@
-import json
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
 from flask import Flask, Response, render_template, request, jsonify
-# from flask_cors import CORS
-from backend.helpers import bigquery
+from flask_cors import CORS
+from PIL import Image
 app = Flask(__name__)
-# CORS(app)
-# app.config['CORS_HEADERS'] = 'Content-Type'
+CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 
 @app.route("/", methods=['GET'])
@@ -13,7 +15,7 @@ app = Flask(__name__)
 @app.route("/dashboard", methods=['GET'])
 @app.route("/support", methods=['GET'])
 def main():
-    model = {"title": "Maintenance & Service Department."}
+    model = {"title": "Handwritten Digit Recognition."}
     return render_template('index.html', model=model)
 
 
@@ -27,7 +29,7 @@ def get_client():
         - name
         - location
     """
-    return jsonify(bigquery.get_clients())
+    return {}
 
 
 @app.get("/types")
@@ -37,7 +39,15 @@ def get_task_types():
         GET: /types
         Returns: (JSON, String Array)
     """
-    return jsonify(bigquery.get_task_types())
+    return {}
+
+
+@app.route("/im_size", methods=["POST"])
+def process_image():
+    nparr = np.fromstring(request.data, np.uint8)
+    img = cv2.imdecode(nparr, cv2.IMREAD_GRAYSCALE)
+    im_pil = Image.fromarray(img)
+    return jsonify({'msg': 'success', 'size': 'size={}x{}'.format(img.shape[1], img.shape[0])})
 
 
 @app.post("/predict")
@@ -71,26 +81,7 @@ def predict():
     if not 'quantity' in content:
         return Response(status=400, content_type='application/json', response=json.dumps({"message": "quantity is missing."}))
 
-    # Check if the clientId is valid
-    client_id = content['clientId']
-    clients = bigquery.get_clients()
-    client_found = False
-    for client in clients:
-        if client['clientId'] == client_id:
-            client_found = True
-
-    if not client_found:
-        return Response(status=400, content_type='application/json', response=json.dumps({"message": f"Unknown clientId provided."}))
-
-    # Check if the taskType is valid
-    task_type = content['taskType']
-    task_types = bigquery.get_task_types()
-    if not task_type in task_types:
-        return Response(status=400, content_type='application/json', response=json.dumps({"message": f"Unknown taskType provided. Allowed: {', '.join(task_types)}"}))
-
-    # Get data from BigQuery
-    return jsonify(bigquery.get_time_spent_norm_prediction(
-        client_id, task_type, content['quantity'], content['limit'] if 'limit' in content else 10))
+    return {}
 
 
 if __name__ == "__main__":
