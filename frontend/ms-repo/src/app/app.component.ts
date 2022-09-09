@@ -8,6 +8,6 @@ import { Spinkit } from 'ng-http-loader';
 })
 export class AppComponent {
   public spinkit = Spinkit;
-  public opacity: Number = .6
-  title = 'ms-repo';
+  public opacity: Number = 0.6;
+  title = 'Handwritten Digit Recognition Application';
 }
