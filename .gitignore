@@ -1,3 +1,12 @@
 .DS_Store
 __pycache__
 *.json
+*.gz
+backend/data/MNIST/raw/t10k-images-idx3-ubyte
+backend/data/MNIST/raw/t10k-labels-idx1-ubyte
+backend/data/MNIST/raw/train-images-idx3-ubyte
+backend/data/MNIST/raw/train-labels-idx1-ubyte
+data/MNIST/raw/t10k-images-idx3-ubyte
+data/MNIST/raw/t10k-labels-idx1-ubyte
+data/MNIST/raw/train-images-idx3-ubyte
+data/MNIST/raw/train-labels-idx1-ubyte
