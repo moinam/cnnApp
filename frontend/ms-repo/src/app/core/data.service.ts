@@ -13,8 +13,8 @@ const httpOptions = {
 export class DataService {
   result: any;
   resAvail: boolean = false;
-  serverUrl = 'http://localhost:8080'; //local setting
-  //serverUrl = ''; //production setting
+  // serverUrl = 'http://localhost:8080'; //local setting
+  serverUrl = ''; //production setting
   constructor(private http: HttpClient, private spinner: NgxSpinnerService, private messageService: MessageService) {}
 
   /**
