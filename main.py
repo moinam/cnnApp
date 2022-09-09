@@ -1,9 +1,11 @@
 import cv2
 import numpy as np
-import matplotlib.pyplot as plt
+import backend.cnn_model as cnn_model
+from backend.cnn_model import CNN
 from flask import Flask, Response, render_template, request, jsonify
 from flask_cors import CORS
 from PIL import Image
+import json
 app = Flask(__name__)
 CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
@@ -32,57 +34,31 @@ def get_client():
     return {}
 
 
-@app.get("/types")
-def get_task_types():
-    """
-        Returns a list of all task types
-        GET: /types
-        Returns: (JSON, String Array)
-    """
-    return {}
-
-
-@app.route("/im_size", methods=["POST"])
+@app.route("/recognize", methods=["POST"])
 def process_image():
-    nparr = np.fromstring(request.data, np.uint8)
-    img = cv2.imdecode(nparr, cv2.IMREAD_GRAYSCALE)
-    im_pil = Image.fromarray(img)
-    return jsonify({'msg': 'success', 'size': 'size={}x{}'.format(img.shape[1], img.shape[0])})
-
-
-@app.post("/predict")
-def predict():
     """
-        Returns the most fitting team for a task
-        POST: /predict
-        Payload: (JSON)
-        - taskType
-        - clientId
-        - quantity
-        - limit (optional) - max teams that will be returned (defaults to 10)
+        Returns the recognized digit from the cnn model from the image
+        POST: /recognize
+        Payload: Image
 
-        Returns: (JSON) [Time data is provided in seconds]
-        - teamId
-        - location
-        - prediction (TimeSpentNorm prediction [in seconds])
-        - predictedWorkingTime (TimeSpentNorm prediction multiplied by quantity [in seconds])
-        - travelDuration (Time it takes to get to the clients location by driving [in seconds])
-        - total (predictedWorkingTime + travelDuration [in seconds])
+        Returns: (JSON)
+        - message
+        - image size
+        - prediction (recognized digit)
     """
-    content = request.json
+    try:
+        nparr = np.fromstring(request.data, np.uint8)
+        img = cv2.imdecode(nparr, cv2.IMREAD_GRAYSCALE)
+        im_pil = Image.fromarray(img)
+    except:
+        return Response(status=400, content_type='application/json', response=json.dumps({"message": "Invalid file or Broken Image."}))
+    else:
+        try:
+            pred_y = cnn_model.predict_image(im_pil)
+        except:
+            return Response(status=400, content_type='application/json', response=json.dumps({"message": "Could not resize image dimesnions to 28x28."}))
 
-    # Check if every required parameter is defined
-    if not 'clientId' in content:
-        return Response(status=400, content_type='application/json', response=json.dumps({"message": "clientId is missing."}))
-
-    if not 'taskType' in content:
-        return Response(status=400, content_type='application/json', response=json.dumps({"message": "taskType is missing."}))
-
-    if not 'quantity' in content:
-        return Response(status=400, content_type='application/json', response=json.dumps({"message": "quantity is missing."}))
-
-    return {}
-
+    return jsonify({'message': 'success', 'size': 'size={}x{}'.format(img.shape[1], img.shape[0]), 'Prediction': np.ndarray.item(pred_y)})
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=8080, debug=True, threaded=True)
