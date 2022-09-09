@@ -1,4 +1,3 @@
-import io
 import os
 from PIL import Image
 import torch
@@ -7,7 +6,9 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 from torchvision.transforms import ToTensor
-import matplotlib.pyplot as plt
+
+
+PATH = os.path.join(os.getcwd(), "backend", "cnn_model.pt")
 
 class CNN(nn.Module):
     def __init__(self):
@@ -116,34 +117,24 @@ def test_model(cnn: CNN, loaders):
         print(f'Prediction number: {pred_y}')
         print(f'Actual number: {actual_number}')
 
-def predict_image(image, cnn:CNN):
-    transforms = transforms.Compose([transforms.Resize(28), transforms.ToTensor(),])
-    image_tensor = transforms(image).float()
+def predict_image(image):
+    # Load cnn model
+    cnn = torch.load(PATH)
+    cnn.eval()
+    transform_img = transforms.Compose([transforms.Resize(28), transforms.ToTensor(),])
+    image_tensor = transform_img(image).float()
     image_tensor = image_tensor.unsqueeze_(0)
     input = torch.autograd.Variable(image_tensor)
-    output, last_layer = cnn(input)
-    pred_y = torch.max(output, 1)[1].data.numpy().squeeze()
+    with torch.no_grad():
+        output, last_layer = cnn(input)
+        pred_y = torch.max(output, 1)[1].data.numpy().squeeze()
     return pred_y
 
 
-def main():
+def make_cnn_model():
     cnn = CNN()
-    img_path = os.getcwd() + "\\5.png"
-    img = Image.open(img_path)
-    imgGray = img.convert('L')
     loaders = load_data()
-    # train_model(10, cnn, loaders)
-    # test_model(cnn, loaders)
-    PATH = os.getcwd() + "\\cnn_model.pt"
-    # Save
-    # torch.save(cnn, PATH)
-    # Load
-    cnn = torch.load(PATH)
-    cnn.eval()
-    pred_y = predict_image(imgGray, cnn)
-    print(pred_y)
-    plt.show()
-
-
-if __name__ == "__main__":
-    main()
+    train_model(10, cnn, loaders)
+    test_model(cnn, loaders)
+    # Save cnn model
+    torch.save(cnn, PATH)
