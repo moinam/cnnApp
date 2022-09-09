@@ -3,11 +3,11 @@ import numpy as np
 import backend.cnn_model as cnn_model
 from backend.cnn_model import CNN
 from flask import Flask, Response, render_template, request, jsonify
-from flask_cors import CORS
+# from flask_cors import CORS
 from PIL import Image
 import json
 app = Flask(__name__)
-CORS(app)
+# CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
 
