@@ -20,20 +20,6 @@ def main():
     model = {"title": "Handwritten Digit Recognition."}
     return render_template('index.html', model=model)
 
-
-@app.get("/clients")
-def get_client():
-    """
-        Returns a list of all clients
-        GET: /clients
-        Returns: (JSON, Array)
-        - clientId
-        - name
-        - location
-    """
-    return {}
-
-
 @app.route("/recognize", methods=["POST"])
 def process_image():
     """

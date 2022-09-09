@@ -1,5 +1,4 @@
 import os
-from PIL import Image
 import torch
 import torch.nn as nn
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -11,6 +10,11 @@ from torchvision.transforms import ToTensor
 PATH = os.path.join(os.getcwd(), "backend", "cnn_model.pt")
 
 class CNN(nn.Module):
+    """
+        CNN Class
+
+        Initial Configuration of the CNN model to be trained and tested
+    """
     def __init__(self):
         super(CNN, self).__init__()
         self.conv1 = nn.Sequential(
@@ -42,6 +46,12 @@ class CNN(nn.Module):
 
 
 def load_data():
+    """
+        Load MNIST data
+        
+        Returns 
+            loaders: Object contatining train adn test data of MNIST
+    """
     train_data = datasets.MNIST(
         root='data',
         train=True,
@@ -68,6 +78,13 @@ def load_data():
     return loaders
 
 def train_model(n_epochs, cnn: CNN, loaders):
+    """
+        Train the CNN model on train data and print results
+        Parameters
+            n_epochs: number of iterations
+            cnn: CNN object
+            loaders: loaded MNIST data
+    """
     loss_func = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(cnn.parameters(), lr=0.01)
     cnn.train()
@@ -97,6 +114,12 @@ def train_model(n_epochs, cnn: CNN, loaders):
     print(loss, optimizer)
 
 def test_model(cnn: CNN, loaders):
+    """
+        Test the CNN model on test data and print results
+        Parameters
+            cnn: CNN object
+            loaders: loaded MNIST data
+    """
     # Test the model
     cnn.eval()
 
@@ -118,6 +141,14 @@ def test_model(cnn: CNN, loaders):
         print(f'Actual number: {actual_number}')
 
 def predict_image(image):
+    """
+        Returns the recognized digit from the cnn model from the Input image
+        Parameters
+            image: Image of type PIL
+
+        Returns: 
+            pred_y: predicted value from CNN
+    """
     # Load cnn model
     cnn = torch.load(PATH)
     cnn.eval()
@@ -132,6 +163,9 @@ def predict_image(image):
 
 
 def make_cnn_model():
+    """
+        Trains the CNN model and the saves it in the local storage
+    """
     cnn = CNN()
     loaders = load_data()
     train_model(10, cnn, loaders)
