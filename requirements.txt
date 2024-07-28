@@ -4,4 +4,4 @@ Pillow==10.3.0
 torch==2.2.0
 torchvision==0.13.1+cu116
 opencv-contrib-python==4.5.5.64
-Flask-Cors==3.0.10
+Flask-Cors==4.0.1
