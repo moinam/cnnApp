@@ -1,7 +1,7 @@
 Flask==2.0.3
 numpy==1.23.2
 Pillow==10.3.0
-torch==1.12.1+cu116
+torch==2.2.0
 torchvision==0.13.1+cu116
 opencv-contrib-python==4.5.5.64
 Flask-Cors==3.0.10
